@@ -5,5 +5,8 @@
         "psr-4": {
             "Pohoda\\": "src/"
         }
+    },
+    "require": {
+        "nette/utils": "^2.4"
     }
 }

@@ -5,9 +5,8 @@
 
 namespace Pohoda\Export;
 
-
 interface IExport
 {
-	public function export(\SimpleXMLElement $xml);
 
+    public function export(\SimpleXMLElement $xml);
 }

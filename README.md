@@ -20,9 +20,9 @@ try {
 	// cena faktury s DPH (po staru) - volitelně
 	$invoice->setText('faktura za prace ...');
 	$price = 1000;
-	$invoice->setPriceWithoutVAT($price);
-	$invoice->setPriceOnlyVAT($price*0.21);
-	$invoice->withVAT(true);
+        $invoice->setPriceLow($price);
+        $invoice->setPriceLowVAT($price * 0.21);
+        $invoice->setWithVat(true);
 	$invoice->setActivity('eshop'); //cinnost v pohode [volitelne, typ:ids]
 	$invoice->setCentre('stredisko'); //stredisko v pohode [volitelne, typ:ids]
 	$invoice->setContract('zak1'); //zakazka v pohode [volitelne, typ:ids]
