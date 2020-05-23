@@ -6,8 +6,8 @@ use Pohoda\Export\Address;
 
 class Export
 {
-    const NS_FTR  = 'http://www.stormware.cz/schema/version_2/filter.xsd';
-    const NS_TYPE = 'http://www.stormware.cz/schema/version_2/type.xsd';
+	const NS_FTR = 'http://www.stormware.cz/schema/version_2/filter.xsd';
+	const NS_TYPE = 'http://www.stormware.cz/schema/version_2/type.xsd';
 
     public $ico       = '';
     private $invoices = [];

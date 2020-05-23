@@ -5,368 +5,430 @@
 
 namespace Pohoda;
 
+
 class InvoiceItem
 {
-    const VAT_NONE  = "none";
-    const VAT_HIGH  = "high";
-    const VAT_LOW   = "low";
-    const VAT_THIRD = "third";
+	const VAT_NONE = "none";
+	const VAT_HIGH = "high";
+	const VAT_LOW = "low";
+	const VAT_THIRD = "third";
 
-    private $text;
-    private $quantity        = '1.0';
-    private $unit;
-    private $coefficient     = '1.0';
-    private $payVAT          = false; //unitPrice is with (true) or without (false) VAT
-    private $rateVAT;
-    private $percentVAT;
-    private $discountPercentage;
-    private $homeCurrency    = [
-        "unitPrice" => null, //mandatory
-        "price" => null, //optional
-        "priceVAT" => null, //optional
-        "priceSum" => null, //only for export from pohoda
-    ];
-    private $foreignCurrency = [
-        "unitPrice" => null, //mandatory
-        "price" => null, //optional
-        "priceVAT" => null, //optional
-        "priceSum" => null, //only for export from pohoda
-    ];
-    private $note;
-    private $code;
-    private $guarantee       = 48;
-    private $guaranteeType   = "month";
-    private $stockItem; //odkaz na skladovou zasobu
+	private $text;
+	private $quantity = '1.0';
+	private $unit;
+	private $coefficient = '1.0';
+	private $payVAT = false; //unitPrice is with (true) or without (false) VAT
+	private $rateVAT;
+	private $percentVAT;
+	private $discountPercentage;
+	private $homeCurrency = [
+		"unitPrice" => null, //mandatory
+		"price" => null, //optional
+		"priceVAT" => null, //optional
+		"priceSum" => null, //only for export from pohoda
+	];
+	private $foreignCurrency = [
+		"unitPrice" => null, //mandatory
+		"price" => null, //optional
+		"priceVAT" => null, //optional
+		"priceSum" => null, //only for export from pohoda
+	];
+	private $note;
+	private $code;
+	private $guarantee = 48;
+	private $guaranteeType = "month";
 
-    /**
-     * @return string $text
-     */
+	private $stockItem; //odkaz na skladovou zasobu
 
-    public function getText()
-    {
-        return $this->text;
-    }
 
-    public function setText($text)
-    {
-        if (Validators::isMaxLength($text, 90) === false)
-                $text       = mb_substr($text, 0, 90);
-        $this->text = $text;
-    }
+	/**
+	 * @return string $text
+	 */
+	public function getText()
+	{
+		return $this->text;
+	}
 
-    /**
-     * @return float
-     */
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
 
-    /**
-     * @param float $quantity
-     */
-    public function setQuantity($quantity)
-    {
-        Validators::isNumeric($quantity);
-        $this->quantity = $quantity;
-    }
+	public function setText($text)
+	{
+		if (Validators::isMaxLength($text, 90) === false)
+			$text = mb_substr($text, 0, 90);
+		$this->text = $text;
+	}
 
-    /**
-     * @return string $unit
-     */
-    public function getUnit()
-    {
-        return $this->unit;
-    }
+	/**
+	 * @return float
+	 */
+	public function getQuantity()
+	{
+		return $this->quantity;
+	}
 
-    public function setUnit($unit)
-    {
-        Validators::assertMaxLength($unit, 10);
-        $this->unit = $unit;
-    }
 
-    /**
-     * @return float
-     */
-    public function getCoefficient()
-    {
-        return $this->coefficient;
-    }
+	/**
+	 * @param float $quantity
+	 */
+	public function setQuantity($quantity)
+	{
+		Validators::assertNumeric($quantity);
+		$this->quantity = $quantity;
+	}
 
-    /**
-     * @param float $coefficient
-     */
-    public function setCoefficient($coefficient)
-    {
-        Validators::isNumeric($coefficient);
-        $this->coefficient = $coefficient;
-    }
 
-    /**
-     * @return boolean
-     */
-    public function isPayVAT()
-    {
-        return $this->payVAT;
-    }
+	/**
+	 * @return string $unit
+	 */
+	public function getUnit()
+	{
+		return $this->unit;
+	}
 
-    /**
-     * @param boolean $payVAT
-     */
-    public function setPayVAT($payVAT)
-    {
-        Validators::isBoolean($payVAT);
-        $this->payVAT = $payVAT;
-    }
+	public function setUnit($unit)
+	{
+		Validators::assertMaxLength($unit, 10);
+		$this->unit = $unit;
+	}
 
-    /**
-     * @param bool $bool
-     */
-    public function setWithVAT($bool = true)
-    {
-        $this->setPayVAT($bool);
-    }
+	/**
+	 * @return float
+	 */
+	public function getCoefficient()
+	{
+		return $this->coefficient;
+	}
 
-    /**
-     * @return bool
-     */
-    public function isWithVAT()
-    {
-        return $this->isPayVAT();
-    }
+	/**
+	 * @param float $coefficient
+	 */
+	public function setCoefficient($coefficient)
+	{
+		Validators::assertNumeric($coefficient);
+		$this->coefficient = $coefficient;
+	}
 
-    /**
-     * @return
-     */
-    public function getRateVAT()
-    {
-        return $this->rateVAT;
-    }
+	/**
+	 * @return boolean
+	 */
+	public function isPayVAT()
+	{
+		return $this->payVAT;
+	}
 
-    /**
-     * @param mixed $rateVAT
-     */
-    public function setRateVAT($rateVAT)
-    {
-        $rates = [
-            self::VAT_NONE => "bez DPH",
-            self::VAT_HIGH => "Základní sazba",
-            self::VAT_LOW => "Snížena sazba",
-            self::VAT_THIRD => "2. snížená sazba"
-        ];
+	/**
+	 * @param boolean $payVAT
+	 */
+	public function setPayVAT($payVAT)
+	{
+		Validators::assertBoolean($payVAT);
+		$this->payVAT = $payVAT;
+	}
 
-        Validators::assertKeyInList($rateVAT, $rates);
-        $this->rateVAT = $rateVAT;
-    }
+	/**
+	 * @param bool $bool
+	 */
+	public function setWithVAT($bool = true)
+	{
+		$this->setPayVAT($bool);
+	}
 
-    /**
-     * @return float
-     */
-    public function getPercentVAT()
-    {
-        return $this->percentVAT;
-    }
+	/**
+	 * @return bool
+	 */
+	public function isWithVAT()
+	{
+		return $this->isPayVAT();
+	}
 
-    /**
-     * @param float $percentVAT
-     */
-    public function setPercentVAT($percentVAT)
-    {
-        Validators::isNumeric($percentVAT);
-        $this->percentVAT = $percentVAT;
-    }
+	/**
+	 * @return
+	 */
+	public function getRateVAT()
+	{
+		return $this->rateVAT;
+	}
 
-    /**
-     * @return float
-     */
-    public function getDiscountPercentage()
-    {
-        return $this->discountPercentage;
-    }
+	/**
+	 * @param mixed $rateVAT
+	 */
+	public function setRateVAT($rateVAT)
+	{
+		$rates = [
+			self::VAT_NONE => "bez DPH",
+			self::VAT_HIGH => "Základní sazba",
+			self::VAT_LOW => "Snížena sazba",
+			self::VAT_THIRD => "2. snížená sazba"
+		];
 
-    /**
-     * @param float $discountPercentage
-     */
-    public function setDiscountPercentage($discountPercentage)
-    {
-        Validators::isNumeric($discountPercentage);
-        if ($discountPercentage < -999 || $discountPercentage > 999)
-                throw new \InvalidArgumentException($discountPercentage." must be betweeen -999 and 999");
-        $this->discountPercentage = $discountPercentage;
-    }
+		Validators::assertKeyInList($rateVAT, $rates);
+		$this->rateVAT = $rateVAT;
+	}
 
-    /**
-     * @return array
-     */
-    public function getHomeCurrency()
-    {
-        return $this->homeCurrency;
-    }
+	/**
+	 * @return float
+	 */
+	public function getPercentVAT()
+	{
+		return $this->percentVAT;
+	}
 
-    public function getUnitPrice()
-    {
-        return $this->homeCurrency["unitPrice"];
-    }
+	/**
+	 * @param float $percentVAT
+	 */
+	public function setPercentVAT($percentVAT)
+	{
+		Validators::assertNumeric($percentVAT);
+		$this->percentVAT = $percentVAT;
+	}
 
-    /**
-     * @param float $price
-     */
-    public function setUnitPrice($price)
-    {
-        Validators::isNumeric($price);
-        $this->homeCurrency["unitPrice"] = $price;
-    }
+	/**
+	 * @return float
+	 */
+	public function getDiscountPercentage()
+	{
+		return $this->discountPercentage;
+	}
 
-    public function getPrice()
-    {
-        return $this->homeCurrency["price"];
-    }
+	/**
+	 * @param float $discountPercentage
+	 */
+	public function setDiscountPercentage($discountPercentage)
+	{
+		Validators::assertNumeric($discountPercentage);
+		if ($discountPercentage < -999 || $discountPercentage > 999)
+			throw new \InvalidArgumentException($discountPercentage . " must be betweeen -999 and 999");
+		$this->discountPercentage = $discountPercentage;
+	}
 
-    /**
-     * @param float $price
-     */
-    public function setPrice($price)
-    {
-        //without tax (vat)
-        Validators::isNumeric($price);
-        $this->homeCurrency["price"] = $price;
-    }
+	/**
+	 * @return array
+	 */
+	public function getHomeCurrency()
+	{
+		return $this->homeCurrency;
+	}
 
-    public function getPriceVAT()
-    {
-        return $this->homeCurrency["priceVAT"];
-    }
+	public function getUnitPrice()
+	{
+		return $this->homeCurrency["unitPrice"];
+	}
 
-    /**
-     * @param float $price
-     */
-    public function setPriceVAT($price)
-    {
-        //only vat itself
-        Validators::isNumeric($price);
-        $this->homeCurrency["priceVAT"] = $price;
-    }
+	/**
+	 * @param float $price
+	 */
+	public function setUnitPrice($price)
+	{
+		Validators::assertNumeric($price);
+		$this->homeCurrency["unitPrice"] = $price;
+	}
 
-    public function getPriceSum()
-    {
-        return $this->homeCurrency["priceSum"];
-    }
+	public function getPrice()
+	{
+		return $this->homeCurrency["price"];
+	}
 
-    public function setPriceSum($price)
-    {
-        //price with vat
-        trigger_error("PriceSUM is only for export from POHODA");
-        Validators::isNumeric($price);
-        $this->homeCurrency["priceSum"] = $price;
-    }
+	/**
+	 * @param float $price
+	 */
+	public function setPrice($price)
+	{
+		//without tax (vat)
+		Validators::assertNumeric($price);
+		$this->homeCurrency["price"] = $price;
+	}
 
-    /**
-     * @return array
-     */
-    public function getForeignCurrency()
-    {
-        return $this->foreignCurrency;
-    }
+	public function getPriceVAT()
+	{
+		return $this->homeCurrency["priceVAT"];
+	}
 
-    /**
-     * @param array $foreignCurrency
-     */
-    public function setForeignCurrency(array $foreignCurrency)
-    {
-        $this->foreignCurrency = $foreignCurrency;
-    }
+	/**
+	 * @param float $price
+	 */
+	public function setPriceVAT($price)
+	{
+		//only vat itself
+		Validators::assertNumeric($price);
+		$this->homeCurrency["priceVAT"] = $price;
+	}
 
-    /**
-     * @return string
-     */
-    public function getNote()
-    {
-        return $this->note;
-    }
 
-    /**
-     * @param string $note
-     */
-    public function setNote($note)
-    {
-        if (Validators::isMaxLength($note, 90) === false)
-                $note       = mb_substr($note, 0, 90);
-        $this->note = $note;
-    }
+	public function getPriceSum()
+	{
+		return $this->homeCurrency["priceSum"];
+	}
 
-    /**
-     * @return null|string
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
 
-    /**
-     * @param string $code
-     */
-    public function setCode($code)
-    {
-        Validators::assertMaxLength($code, 64);
-        $this->code = $code;
-    }
+	public function setPriceSum($price)
+	{
+		//price with vat
+		trigger_error("PriceSUM is only for export from POHODA");
+		Validators::assertNumeric($price);
+		$this->homeCurrency["priceSum"] = $price;
+	}
 
-    /**
-     * @return int
-     */
-    public function getGuarantee()
-    {
-        return $this->guarantee;
-    }
 
-    /**
-     * @param int $guarantee
-     */
-    public function setGuarantee($guarantee)
-    {
-        Validators::assertNumeric($guarantee);
-        $this->guarantee = $guarantee;
-    }
+	/**
+	 * @return array
+	 */
+	public function getForeignCurrency()
+	{
+		return $this->foreignCurrency;
+	}
 
-    /**
-     * @return string
-     */
-    public function getGuaranteeType()
-    {
-        return $this->guaranteeType;
-    }
 
-    /**
-     * @param string $guaranteeType
-     */
-    public function setGuaranteeType($guaranteeType)
-    {
-        $types = [
-            "none" => "bez záruky",
-            "hour" => "v hodinách",
-            "day" => "ve dnech",
-            "month" => "v měsících",
-            "year" => "v letech",
-            "life" => "doživotní záruka",
-        ];
+	public function getForeignUnitPrice()
+	{
+		return $this->foreignCurrency["unitPrice"];
+	}
 
-        Validators::assertKeyInList($guaranteeType, $types);
-        $this->guaranteeType = $guaranteeType;
-    }
+	/**
+	 * @param float $price
+	 */
+	public function setForeignUnitPrice($price)
+	{
+		Validators::assertNumeric($price);
+		$this->foreignCurrency["unitPrice"] = $price;
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getStockItem()
-    {
-        return $this->stockItem;
-    }
+	public function getForeignPrice()
+	{
+		return $this->foreignCurrency["price"];
+	}
 
-    /**
-     * @param mixed $stockItem
-     */
-    public function setStockItem($stockItem)
-    {
-        $this->stockItem = $stockItem;
-    }
+	/**
+	 * @param float $price
+	 */
+	public function setForeignPrice($price)
+	{
+		//without tax (vat)
+		Validators::assertNumeric($price);
+		$this->foreignCurrency["price"] = $price;
+	}
+
+	public function getForeignPriceVAT()
+	{
+		return $this->foreignCurrency["priceVAT"];
+	}
+
+	/**
+	 * @param float $price
+	 */
+	public function setForeignPriceVAT($price)
+	{
+		//only vat itself
+		Validators::assertNumeric($price);
+		$this->foreignCurrency["priceVAT"] = $price;
+	}
+
+
+	public function getForeignPriceSum()
+	{
+		return $this->foreignCurrency["priceSum"];
+	}
+
+
+	public function setForeignPriceSum($price)
+	{
+		//price with vat
+		trigger_error("PriceSUM is only for export from POHODA");
+		Validators::assertNumeric($price);
+		$this->foreignCurrency["priceSum"] = $price;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getNote()
+	{
+		return $this->note;
+	}
+
+	/**
+	 * @param string $note
+	 */
+	public function setNote($note)
+	{
+		if (Validators::isMaxLength($note, 90) === false)
+			$note = mb_substr($note, 0, 90);
+		$this->note = $note;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getCode()
+	{
+		return $this->code;
+	}
+
+	/**
+	 * @param string $code
+	 */
+	public function setCode($code)
+	{
+		Validators::assertMaxLength($code, 64);
+		$this->code = $code;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getGuarantee()
+	{
+		return $this->guarantee;
+	}
+
+	/**
+	 * @param int $guarantee
+	 */
+	public function setGuarantee($guarantee)
+	{
+		Validators::assertNumeric($guarantee);
+		$this->guarantee = $guarantee;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getGuaranteeType()
+	{
+		return $this->guaranteeType;
+	}
+
+	/**
+	 * @param string $guaranteeType
+	 */
+	public function setGuaranteeType($guaranteeType)
+	{
+		$types = [
+			"none" => "bez záruky",
+			"hour" => "v hodinách",
+			"day" => "ve dnech",
+			"month" => "v měsících",
+			"year" => "v letech",
+			"life" => "doživotní záruka",
+		];
+
+		Validators::assertKeyInList($guaranteeType, $types);
+		$this->guaranteeType = $guaranteeType;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getStockItem()
+	{
+		return $this->stockItem;
+	}
+
+	/**
+	 * @param mixed $stockItem
+	 */
+	public function setStockItem($stockItem)
+	{
+		$this->stockItem = $stockItem;
+	}
+
+
 }

@@ -20,9 +20,18 @@ try {
 	// cena faktury s DPH (po staru) - volitelně
 	$invoice->setText('faktura za prace ...');
 	$price = 1000;
-        $invoice->setPriceLow($price);
-        $invoice->setPriceLowVAT($price * 0.21);
-        $invoice->setWithVat(true);
+	
+	//nizsi sazba dph
+	$invoice->setPriceLow($price); //cena bez dph ve snizene sazbe
+	$invoice->setPriceLowVAT($price * 0.15); //samotna dan
+	
+	//nebo vyssi sazba dph
+	$invoice->setPriceHigh($price); //cena bez dph ve zvysene sazbe
+	$invoice->setPriceHighVAT($price * 0.21); //samotna dan
+	$invoice->setPriceHighSum($price * 1.21); //cena s dph ve zvysene sazbe
+	
+	$invoice->setWithVat(true); //viz inv:classificationVAT - true nastavi cleneni dph na inland - tuzemske plneni, jinak da nonSubsume - nezahrnovat do DPH
+	
 	$invoice->setActivity('eshop'); //cinnost v pohode [volitelne, typ:ids]
 	$invoice->setCentre('stredisko'); //stredisko v pohode [volitelne, typ:ids]
 	$invoice->setContract('zak1'); //zakazka v pohode [volitelne, typ:ids]
